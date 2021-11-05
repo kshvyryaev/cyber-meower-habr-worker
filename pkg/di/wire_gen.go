@@ -7,6 +7,8 @@
 package di
 
 import (
+	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg"
+	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/client"
 	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/service"
 	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/worker"
 	"go.uber.org/zap"
@@ -22,7 +24,14 @@ func InitializeHabrDownloaderWorker(logger *zap.Logger) (*worker.HabrDownloaderW
 	}
 }
 
-func InitializeHabrUploaderWorker(logger *zap.Logger) *worker.HabrUploaderWorker {
-	habrUploaderWorker := worker.ProvideHabrUploaderWorker(logger)
-	return habrUploaderWorker
+func InitializeHabrUploaderWorker(config *pkg.Config, logger *zap.Logger) (*worker.HabrUploaderWorker, func(), error) {
+	clientConn, cleanup, err := client.ProvideMeowerServiceGrpcConnection(config)
+	if err != nil {
+		return nil, nil, err
+	}
+	grpcMeowClient := client.ProvideGrpcMeowClient(clientConn)
+	habrUploaderWorker := worker.ProvideHabrUploaderWorker(grpcMeowClient, logger)
+	return habrUploaderWorker, func() {
+		cleanup()
+	}, nil
 }

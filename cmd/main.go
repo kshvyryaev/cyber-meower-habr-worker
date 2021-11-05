@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	config := pkg.ProvideConfig()
+
 	logger, loggerCleanup, err := pkg.ProvideZap()
 	if err != nil {
 		panic("cannot initialize zap logger: " + err.Error())
@@ -17,7 +19,11 @@ func main() {
 	downloader, downloaderCleanup := di.InitializeHabrDownloaderWorker(logger)
 	defer downloaderCleanup()
 
-	uploader := di.InitializeHabrUploaderWorker(logger)
+	uploader, uploaderCleanup, err := di.InitializeHabrUploaderWorker(config, logger)
+	if err != nil {
+		panic("cannot uploader: " + err.Error())
+	}
+	defer uploaderCleanup()
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)

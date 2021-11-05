@@ -3,25 +3,36 @@ package worker
 import (
 	"sync"
 
+	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/client"
 	"go.uber.org/zap"
 )
 
 type HabrUploaderWorker struct {
-	logger *zap.Logger
+	meowClient client.MeowClient
+	logger     *zap.Logger
 }
 
-func ProvideHabrUploaderWorker(logger *zap.Logger) *HabrUploaderWorker {
+func ProvideHabrUploaderWorker(meowClient client.MeowClient, logger *zap.Logger) *HabrUploaderWorker {
 	return &HabrUploaderWorker{
-		logger: logger,
+		meowClient: meowClient,
+		logger:     logger,
 	}
 }
 
 func (worker *HabrUploaderWorker) Run(channel chan []string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	for range channel {
-		worker.logger.Info("Uploading best titles started")
-		// TODO: Implement it
-		worker.logger.Info("Uploading best titles finished")
+	for titles := range channel {
+		worker.logger.Info("uploading best titles started")
+
+		for _, title := range titles {
+			err := worker.meowClient.Create(title)
+			if err != nil {
+				worker.logger.Error("title didn't create", zap.String("body", title), zap.Error(err))
+			}
+			worker.logger.Info("title created", zap.String("body", title))
+		}
+
+		worker.logger.Info("uploading best titles finished")
 	}
 }

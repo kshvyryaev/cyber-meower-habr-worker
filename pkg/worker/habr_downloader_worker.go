@@ -38,15 +38,15 @@ func (worker *HabrDownloaderWorker) Run(wg *sync.WaitGroup) {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		worker.logger.Info("Downloading best titles started")
+		worker.logger.Info("downloading best titles started")
 		titles, err := worker.habrDownloaderService.DownloadBestTitles()
 		if err != nil {
-			worker.logger.Error("Downloading best titles finished with errors: ", zap.Error(err))
+			worker.logger.Error("downloading best titles finished with errors: ", zap.Error(err))
 		}
-		worker.logger.Info("Downloading best titles finished succesfuly")
+		worker.logger.Info("downloading best titles finished succesfuly")
 
 		worker.channel <- titles
-		worker.logger.Info("Best titles sent to channel")
+		worker.logger.Info("best titles sent to channel")
 	}
 }
 
