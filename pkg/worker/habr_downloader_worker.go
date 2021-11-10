@@ -4,18 +4,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/service"
+	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/contract"
 	"go.uber.org/zap"
 )
 
 type HabrDownloaderWorker struct {
-	habrDownloaderService *service.HabrDownloaderService
-	logger                *zap.Logger
-	channel               chan []string
+	habrDownloader contract.HabrDownloaderService
+	logger         *zap.Logger
+	channel        chan []string
 }
 
 func ProvideHabrDownloaderWorker(
-	habrDownloaderService *service.HabrDownloaderService,
+	habrDownloader contract.HabrDownloaderService,
 	logger *zap.Logger) (*HabrDownloaderWorker, func()) {
 	channel := make(chan []string)
 
@@ -24,9 +24,9 @@ func ProvideHabrDownloaderWorker(
 	}
 
 	return &HabrDownloaderWorker{
-		habrDownloaderService: habrDownloaderService,
-		logger:                logger,
-		channel:               channel,
+		habrDownloader: habrDownloader,
+		logger:         logger,
+		channel:        channel,
 	}, cleanup
 }
 
@@ -39,7 +39,7 @@ func (worker *HabrDownloaderWorker) Run(wg *sync.WaitGroup) {
 
 	for range ticker.C {
 		worker.logger.Info("downloading best titles started")
-		titles, err := worker.habrDownloaderService.DownloadBestTitles()
+		titles, err := worker.habrDownloader.DownloadBestTitles()
 		if err != nil {
 			worker.logger.Error("downloading best titles finished with errors: ", zap.Error(err))
 		}

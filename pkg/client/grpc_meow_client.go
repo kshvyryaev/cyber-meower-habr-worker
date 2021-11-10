@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/wire"
 	"github.com/kshvyryaev/cyber-meower-proto/pkg/proto"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -37,8 +36,3 @@ func (client *GrpcMeowClient) Create(body string) error {
 
 	return nil
 }
-
-var GrpcMeowClientSet = wire.NewSet(
-	ProvideGrpcMeowClient,
-	wire.Bind(new(MeowClient), new(*GrpcMeowClient)),
-)

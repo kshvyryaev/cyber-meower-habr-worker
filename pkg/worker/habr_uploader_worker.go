@@ -3,16 +3,16 @@ package worker
 import (
 	"sync"
 
-	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/client"
+	"github.com/kshvyryaev/cyber-meower-habr-worker/pkg/contract"
 	"go.uber.org/zap"
 )
 
 type HabrUploaderWorker struct {
-	meowClient client.MeowClient
+	meowClient contract.MeowClient
 	logger     *zap.Logger
 }
 
-func ProvideHabrUploaderWorker(meowClient client.MeowClient, logger *zap.Logger) *HabrUploaderWorker {
+func ProvideHabrUploaderWorker(meowClient contract.MeowClient, logger *zap.Logger) *HabrUploaderWorker {
 	return &HabrUploaderWorker{
 		meowClient: meowClient,
 		logger:     logger,
