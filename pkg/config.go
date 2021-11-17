@@ -1,19 +1,19 @@
 package pkg
 
 import (
-	"flag"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 )
 
 type Config struct {
-	MeowerServiceAddress string
+	MeowerServiceAddress string `envconfig:"MEOWER_SERVICE_ADDRESS"`
 }
 
-func ProvideConfig() *Config {
-	config := &Config{
-		MeowerServiceAddress: *flag.String("meowerServiceAddress", "127.0.0.1:8080", "Meower service address"),
+func ProvideConfig() (*Config, error) {
+	var config Config
+	err := envconfig.Process("", &config)
+	if err != nil {
+		return nil, errors.Wrap(err, "config")
 	}
-
-	flag.Parse()
-
-	return config
+	return &config, nil
 }

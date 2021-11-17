@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	config := pkg.ProvideConfig()
+	config, err := pkg.ProvideConfig()
+	if err != nil {
+		panic("cannot initialize config: " + err.Error())
+	}
 
 	logger, loggerCleanup, err := pkg.ProvideZap()
 	if err != nil {
